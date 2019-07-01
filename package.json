@@ -1,0 +1,28 @@
+{
+    "name": "node-web-server",
+    "version": "1.0.0",
+    "description": "wgs Node Static Web Server",
+    "main": "index.js",
+    "dependencies": {},
+    "devDependencies": {
+        "babel-eslint": "^10.0.2",
+        "pre-commit": "^1.2.2"
+    },
+    "scripts": {
+        "lint": "eslint --fix ."
+    },
+    "pre-commit": [
+        "lint"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WGSHUHU/nodeWebServer.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/WGSHUHU/nodeWebServer/issues"
+    },
+    "homepage": "https://github.com/WGSHUHU/nodeWebServer#readme"
+}

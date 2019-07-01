@@ -1,0 +1,7 @@
+logs
+*.log
+node_modules/
+*.wap
+.idea/
+.DS_Store
+build/
