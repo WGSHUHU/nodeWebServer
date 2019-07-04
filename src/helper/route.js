@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const Handlebars = require('handlebars')
+const mime = require('mime');
 const promisify = require('util').promisify
 const stat = promisify(fs.stat)
 const readdir = promisify(fs.readdir)
@@ -15,8 +16,11 @@ module.exports = async function(res, filePath) {
     const stats = await stat(filePath)
     if (stats.isFile()) {
       res.statusCode = 200
-      res.setHeader('Content-Type', 'text/plain')
-      fs.createReadStream(filePath, 'utf-8').pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好
+      let ext = path.basename(filePath).split('.').pop().toLowerCase()
+      // ext就是扩展名
+      const MimeType = mime.getType(ext);
+      res.setHeader('Content-Type', MimeType)
+      fs.createReadStream(filePath).pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好；此处最好不加编码方式(所有文)
     } else if (stats.isDirectory()) {
       const files = await readdir(filePath)
       res.statusCode = 200

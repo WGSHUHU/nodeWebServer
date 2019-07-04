@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>{{ title }}</title>
+    <style>
+      .file-item {
+        display: block;
+        padding: 10px 0;
+      }
+    </style>
   </head>
   <body>
     {{#each files}}
-    <a href="{{../dir}}/{{this}}">{{this}}</a>
+    <a href="{{../dir}}/{{this}}" class="file-item">{{this}}</a>
     {{/each}}
   </body>
 </html>
