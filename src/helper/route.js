@@ -1,7 +1,14 @@
 const fs = require('fs')
+const path = require('path')
+const Handlebars = require('handlebars')
 const promisify = require('util').promisify
 const stat = promisify(fs.stat)
 const readdir = promisify(fs.readdir)
+const config = require('../config/configDefault')
+
+const tplPath = path.join(__dirname, '../template/index.html')
+const source = fs.readFileSync(tplPath, 'utf-8') // 添加编码就是字符串，不加编码读出来的是Buffer
+const template = Handlebars.compile(source)
 
 module.exports = async function(res, filePath) {
   try {
@@ -13,8 +20,14 @@ module.exports = async function(res, filePath) {
     } else if (stats.isDirectory()) {
       const files = await readdir(filePath)
       res.statusCode = 200
-      res.setHeader('Content-Type', 'text/plain')
-      res.end(files.join('\n'))
+      res.setHeader('Content-Type', 'text/html')
+      const dir = path.relative(config.root, filePath)
+      const data = {
+        title: path.basename(filePath),
+        files,
+        dir: dir ? `/${dir}`:''
+      }
+      res.end(template(data))
     }
   } catch (error) {
     res.statusCode = 404
