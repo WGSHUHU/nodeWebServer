@@ -6,12 +6,13 @@ const promisify = require('util').promisify
 const stat = promisify(fs.stat)
 const readdir = promisify(fs.readdir)
 const config = require('../config/configDefault')
+const compress = require('../helper/compress')
 
 const tplPath = path.join(__dirname, '../template/index.html')
 const source = fs.readFileSync(tplPath, 'utf-8') // 添加编码就是字符串，不加编码读出来的是Buffer
 const template = Handlebars.compile(source)
 
-module.exports = async function(res, filePath) {
+module.exports = async function(req, res, filePath) {
   try {
     const stats = await stat(filePath)
     if (stats.isFile()) {
@@ -20,7 +21,12 @@ module.exports = async function(res, filePath) {
       // ext就是扩展名
       const MimeType = mime.getType(ext);
       res.setHeader('Content-Type', MimeType)
-      fs.createReadStream(filePath).pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好；此处最好不加编码方式(所有文)
+      // fs.createReadStream(filePath).pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好；此处最好不加编码方式(所有文)
+      let rs  =  fs.createReadStream(filePath)
+      if(filePath.match(config.compress)){
+        rs = compress(rs, req, res)
+      }
+      rs.pipe(res)
     } else if (stats.isDirectory()) {
       const files = await readdir(filePath)
       res.statusCode = 200

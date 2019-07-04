@@ -6,7 +6,7 @@ const route = require('./helper/route')
 
 const server = http.createServer((req, res) => {
   const filePath = path.join(conf.root, req.url)
-  route(res, filePath)
+  route(req, res, filePath)
 })
 
 server.listen(conf.port, conf.hostname, () => {
