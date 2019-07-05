@@ -8,6 +8,7 @@ const readdir = promisify(fs.readdir)
 const config = require('../config/configDefault')
 const compress = require('../helper/compress')
 const range = require('../helper/range')
+const isFresh = require('../helper/cache')
 
 const tplPath = path.join(__dirname, '../template/index.html')
 const source = fs.readFileSync(tplPath, 'utf-8') // 添加编码就是字符串，不加编码读出来的是Buffer
@@ -22,6 +23,15 @@ module.exports = async function(req, res, filePath) {
       const MimeType = mime.getType(ext);
       res.setHeader('Content-Type', MimeType)
       // fs.createReadStream(filePath).pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好；此处最好不加编码方式(所有文)
+      if(isFresh(stats, req, res)){
+        // 1. 使用缓存，不需要返回内容
+        res.statusCode = 304
+        res.end()
+        return
+      }
+
+
+      // 2. 不使用缓存，走下面的逻辑
       let rs
       const { code, start, end } = range(stats.size, req, res) // stats.size就是文件的大小
       if(code === 200){
