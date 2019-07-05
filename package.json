@@ -10,19 +10,35 @@
         "mime": "^2.4.4"
     },
     "devDependencies": {
+        "@commitlint/cli": "^8.0.0",
+        "@commitlint/config-conventional": "^8.0.0",
         "babel-eslint": "^10.0.2",
+        "commitizen": "^3.1.1",
+        "cz-conventional-changelog": "^2.1.0",
         "eslint": "^6.0.1",
+        "husky": "^3.0.0",
         "nodemon": "^1.19.1",
         "pre-commit": "^1.2.2",
         "supervisor": "^0.12.0"
     },
     "scripts": {
         "dev": "supervisor src/index.js",
-        "lint": "eslint --fix ."
+        "lint": "eslint --fix .",
+        "commit": "git cz"
     },
     "pre-commit": [
         "lint"
     ],
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    },
+    "husky": {
+        "hooks": {
+            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+        }
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/WGSHUHU/nodeWebServer.git"
