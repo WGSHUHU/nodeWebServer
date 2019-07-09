@@ -1,15 +1,24 @@
-const http = require('http')
-const chalk = require('chalk')
-const path = require('path')
-const conf = require('./config/configDefault')
-const route = require('./helper/route')
+const yargs = require('yargs')
+const Server = require('./app')
 
-const server = http.createServer((req, res) => {
-  const filePath = path.join(conf.root, req.url)
-  route(req, res, filePath)
-})
+const argv = yargs
+  .usage('anywhere [options]')
+  .option('p', {
+    alias: 'port',
+    describe: '端口号',
+    default: 3000
+  })
+  .option('h', {
+    alias: 'hostname',
+    describe: 'host',
+    default: '127.0.0.1'
+  })
+  .option('d', {
+    alias: 'root',
+    describe: 'root path',
+    default: process.cwd()
+  }).argv
 
-server.listen(conf.port, conf.hostname, () => {
-  const addr = `http://${conf.hostname}:${conf.port}`
-  console.info(`Server start at ${chalk.green(addr)}`)
-})
+const server = new Server(argv)
+
+server.start()

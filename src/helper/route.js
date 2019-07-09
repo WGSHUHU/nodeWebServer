@@ -1,11 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 const Handlebars = require('handlebars')
-const mime = require('mime');
+const mime = require('mime')
 const promisify = require('util').promisify
 const stat = promisify(fs.stat)
 const readdir = promisify(fs.readdir)
-const config = require('../config/configDefault')
 const compress = require('../helper/compress')
 const range = require('../helper/range')
 const isFresh = require('../helper/cache')
@@ -14,36 +13,40 @@ const tplPath = path.join(__dirname, '../template/index.html')
 const source = fs.readFileSync(tplPath, 'utf-8') // 添加编码就是字符串，不加编码读出来的是Buffer
 const template = Handlebars.compile(source)
 
-module.exports = async function(req, res, filePath) {
+module.exports = async function(req, res, filePath, config) {
   try {
     const stats = await stat(filePath)
     if (stats.isFile()) {
-      let ext = path.basename(filePath).split('.').pop().toLowerCase()
+      let ext = path
+        .basename(filePath)
+        .split('.')
+        .pop()
+        .toLowerCase()
       // ext就是扩展名
-      const MimeType = mime.getType(ext);
+      const MimeType = mime.getType(ext)
       res.setHeader('Content-Type', MimeType)
       // fs.createReadStream(filePath).pipe(res) // 1. 使用流的方式在高并发的情况下，表现更好；此处最好不加编码方式(所有文)
-      if(isFresh(stats, req, res)){
+      if (isFresh(stats, req, res)) {
         // 1. 使用缓存，不需要返回内容
         res.statusCode = 304
         res.end()
         return
       }
 
-
       // 2. 不使用缓存，走下面的逻辑
       let rs
       const { code, start, end } = range(stats.size, req, res) // stats.size就是文件的大小
-      if(code === 200){
+      if (code === 200) {
         res.statusCode = 200
-        rs  =  fs.createReadStream(filePath)
-      }else{
+        rs = fs.createReadStream(filePath)
+      } else {
         res.statusCode = 206
-        rs  =  fs.createReadStream(filePath, {
-          start, end
+        rs = fs.createReadStream(filePath, {
+          start,
+          end
         })
       }
-      if(filePath.match(config.compress)){
+      if (filePath.match(config.compress)) {
         rs = compress(rs, req, res)
       }
       rs.pipe(res)
@@ -55,7 +58,7 @@ module.exports = async function(req, res, filePath) {
       const data = {
         title: path.basename(filePath),
         files,
-        dir: dir ? `/${dir}`:''
+        dir: dir ? `/${dir}` : ''
       }
       res.end(template(data))
     }

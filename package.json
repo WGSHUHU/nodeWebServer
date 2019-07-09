@@ -2,12 +2,16 @@
     "name": "node-web-server",
     "version": "1.0.0",
     "description": "wgs Node Static Web Server",
-    "main": "index.js",
+    "main": "src/app.js",
+    "bin": {
+        "wgs-server": "bin/server"
+    },
     "dependencies": {
         "chalk": "^2.4.2",
         "etag": "^1.8.1",
         "handlebars": "^4.1.2",
-        "mime": "^2.4.4"
+        "mime": "^2.4.4",
+        "yargs": "^13.2.4"
     },
     "devDependencies": {
         "@commitlint/cli": "^8.0.0",
@@ -22,7 +26,7 @@
         "supervisor": "^0.12.0"
     },
     "scripts": {
-        "dev": "supervisor src/index.js",
+        "dev": "supervisor src/app.js",
         "lint": "eslint --fix .",
         "commit": "git cz"
     },
